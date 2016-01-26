@@ -172,12 +172,12 @@ namespace RoomAliveToolkit
         float alpha = 1;
 
         // TODO: make so these can be changed live, put in menu
-        bool threeDObjectEnabled = Properties.Settings.Default.ThreeDObjectEnabled;
-        bool wobbleEffectEnabled = Properties.Settings.Default.WobbleEffectEnabled;
-        bool localHeadTrackingEnabled = Properties.Settings.Default.LocalHeadTrackingEnabled;
+        bool threeDObjectEnabled = false;// Properties.Settings.Default.ThreeDObjectEnabled;
+        bool wobbleEffectEnabled = false;//Properties.Settings.Default.WobbleEffectEnabled;
+        bool localHeadTrackingEnabled = true;// Properties.Settings.Default.LocalHeadTrackingEnabled;
         bool liveDepthEnabled = Properties.Settings.Default.LiveDepthEnabled;
-        bool fullScreenEnabled = Properties.Settings.Default.FullScreenEnabled;
-        bool desktopDuplicationEnabled = Properties.Settings.Default.DesktopDuplicationEnabled;
+        bool fullScreenEnabled = true;// Properties.Settings.Default.FullScreenEnabled;
+        bool desktopDuplicationEnabled = true;// Properties.Settings.Default.DesktopDuplicationEnabled;
 
         void RenderLoop()
         {
@@ -207,14 +207,14 @@ namespace RoomAliveToolkit
                             distanceSquared = dx * dx + dy * dy + dz * dz;
                         }
                         var transform = SharpDX.Matrix.RotationY((float)Math.PI) * SharpDX.Matrix.Translation(0, 0.45f, 0);
-                        headPosition = SharpDX.Vector3.TransformCoordinate(headPosition, transform);
+                        //headPosition = SharpDX.Vector3.TransformCoordinate(headPosition, transform);
 
                         if (trackingValid && (distanceSquared < 0.02f) && (alpha > 1))
                             alpha = 0;
                         //Console.WriteLine(distanceSquared);
                     }
 
-                    var userView = GraphicsTransforms.LookAt(headPosition, headPosition + SharpDX.Vector3.UnitZ, SharpDX.Vector3.UnitY);
+                    var userView = SharpDX.Matrix.Translation(headPosition);// GraphicsTransforms.LookAt(headPosition, headPosition + SharpDX.Vector3.UnitZ, SharpDX.Vector3.UnitY);
                     userView.Transpose();
 
 
@@ -222,7 +222,7 @@ namespace RoomAliveToolkit
 
 
                     float aspect = (float)userViewTextureWidth / (float)userViewTextureHeight;
-                    var userProjection = GraphicsTransforms.PerspectiveFov(55.0f / 180.0f * (float)Math.PI, aspect, 0.001f, 1000.0f);
+                    var userProjection = GraphicsTransforms.PerspectiveFov(20.0f / 180.0f * (float)Math.PI, aspect, 0.001f, 1000.0f);
                     userProjection.Transpose();
 
                     // smooth depth images
@@ -290,7 +290,7 @@ namespace RoomAliveToolkit
                         // update the desktop texture; this will block until there is some change
                         var outputDuplicateFrameInformation = default(OutputDuplicateFrameInformation);
                         SharpDX.DXGI.Resource resource = null;
-                        outputDuplication.AcquireNextFrame(1000, out outputDuplicateFrameInformation, out resource);
+                        outputDuplication.AcquireNextFrame(5000, out outputDuplicateFrameInformation, out resource);
                         var texture = resource.QueryInterface<Texture2D>();
 
                         // pick up the window under the cursor
